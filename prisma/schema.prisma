@@ -1,0 +1,169 @@
+generator client {
+  //provider = "prisma-client"
+  //output   = "../generated/prisma"
+  provider = "prisma-client-js"
+  binaryTargets = ["native", "windows"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model album_categories {
+  id_categorie Int
+  id_album     Int
+  albums       albums     @relation(fields: [id_album], references: [id_album], onDelete: Cascade, map: "fk_album_categories_albums")
+  categories   categories @relation(fields: [id_categorie], references: [id_categorie], onDelete: Cascade, map: "fk_album_categories_categories")
+
+  @@id([id_categorie, id_album])
+  @@index([id_album], map: "fk_album_categories_albums_idx")
+}
+
+model albums {
+  id_album         Int                @id @default(autoincrement())
+  titre            String             @db.VarChar(255)
+  artiste          String             @db.VarChar(255)
+  maison_disque    String?            @db.VarChar(255)
+  annee_sortie     Int?               @db.Year
+  nb_pistes        Int?
+  description      String?            @db.Text
+  ean              String             @unique(map: "ean_UNIQUE") @db.VarChar(13)
+  album_categories album_categories[]
+  exemplaires      exemplaires[]
+}
+
+model categories {
+  id_categorie     Int                @id @default(autoincrement())
+  nom_categorie    String             @unique(map: "nomCategorie_UNIQUE") @db.VarChar(100)
+  album_categories album_categories[]
+}
+
+model exemplaires {
+  id_exemplaire  Int                @id @default(autoincrement())
+  num_inventaire String             @unique(map: "numInventaire_UNIQUE") @db.VarChar(45)
+  etat           exemplaires_etat
+  statut         exemplaires_statut
+  date_achat     DateTime           @db.Date
+  id_album       Int
+  albums         albums             @relation(fields: [id_album], references: [id_album], map: "fk_exemplaires_albums")
+  locations      locations[]
+  reservations   reservations[]
+
+  @@index([id_album], map: "fk_exemplaires_albums_idx")
+}
+
+model locations {
+  id_location        Int              @id @default(autoincrement())
+  date_location      DateTime         @db.DateTime(0)
+  date_retour_prevue DateTime         @db.DateTime(0)
+  date_retour_reelle DateTime?        @db.DateTime(0)
+  montant_location   Decimal          @db.Decimal(10, 2)
+  penalites_retard   Decimal?         @default(0.00) @db.Decimal(10, 2)
+  statut             locations_statut
+  id_utilisateur     Int
+  id_reservation     Int?
+  id_exemplaire      Int
+  exemplaires        exemplaires      @relation(fields: [id_exemplaire], references: [id_exemplaire], onDelete: NoAction, onUpdate: NoAction, map: "fk_locations_exemplaires")
+  reservations       reservations?    @relation(fields: [id_reservation], references: [id_reservation], onDelete: NoAction, onUpdate: NoAction, map: "fk_locations_reservations")
+  utilisateurs       utilisateurs     @relation(fields: [id_utilisateur], references: [id_utilisateur], onDelete: NoAction, onUpdate: NoAction, map: "fk_locations_utilisateurs")
+  paiements          paiements[]
+
+  @@index([id_exemplaire], map: "fk_locations_exemplaires_idx")
+  @@index([id_reservation], map: "fk_locations_reservations_idx")
+  @@index([id_utilisateur], map: "fk_locations_utilisateurs_idx")
+}
+
+model paiements {
+  id_paiement   Int              @id @default(autoincrement())
+  montant       Decimal          @db.Decimal(10, 2)
+  moyen         paiements_moyen
+  statut        paiements_statut
+  date_paiement DateTime         @db.DateTime(0)
+  id_location   Int
+  locations     locations        @relation(fields: [id_location], references: [id_location], onDelete: NoAction, onUpdate: NoAction, map: "fk_paiements_locations")
+
+  @@index([id_location], map: "fk_paiements_locations_idx")
+}
+
+model reservations {
+  id_reservation Int                 @id @default(autoincrement())
+  date_debut     DateTime            @db.Date
+  date_fin       DateTime            @db.Date
+  statut         reservations_statut
+  id_exemplaire  Int
+  id_utilisateur Int
+  locations      locations[]
+  exemplaires    exemplaires         @relation(fields: [id_exemplaire], references: [id_exemplaire], onDelete: NoAction, onUpdate: NoAction, map: "fk_reservations_exemplaires")
+  utilisateurs   utilisateurs        @relation(fields: [id_utilisateur], references: [id_utilisateur], onDelete: NoAction, onUpdate: NoAction, map: "fk_reservations_utilisateurs")
+
+  @@index([id_exemplaire], map: "fk_reservations_exemplaires_idx")
+  @@index([id_utilisateur], map: "fk_reservations_utilisateurs_idx")
+}
+
+model roles {
+  id_role      Int            @id @default(autoincrement())
+  nom_role     String         @unique(map: "nom_role_UNIQUE") @db.VarChar(50)
+  description  String?        @db.VarChar(255)
+  utilisateurs utilisateurs[]
+}
+
+model utilisateurs {
+  id_utilisateur   Int            @id @default(autoincrement())
+  nom              String         @db.VarChar(100)
+  prenom           String         @db.VarChar(100)
+  email            String         @unique(map: "UQ_email") @db.VarChar(100)
+  password_hash    String         @db.VarChar(255)
+  telephone        String?        @db.VarChar(20)
+  rue              String?        @db.VarChar(100)
+  numero           String?        @db.VarChar(10)
+  code_postal      String?        @db.VarChar(10)
+  localite         String?        @db.VarChar(100)
+  ville            String?        @db.VarChar(100)
+  date_inscription DateTime       @default(now()) @db.DateTime(0)
+  id_role          Int
+  locations        locations[]
+  reservations     reservations[]
+  roles            roles          @relation(fields: [id_role], references: [id_role], map: "fk_utilisateurs_roles")
+
+  @@index([id_role], map: "fk_utilisateurs_roles_idx")
+}
+
+enum exemplaires_etat {
+  Neuf
+  Bon
+  Us_       @map("Usé")
+  Endommag_ @map("Endommagé")
+}
+
+enum paiements_moyen {
+  Carte
+  Esp_ces  @map("Espèces")
+  Virement
+  En_ligne @map("En ligne")
+}
+
+enum reservations_statut {
+  Active
+  Annul_e  @map("Annulée")
+  Termin_e @map("Terminée")
+}
+
+enum exemplaires_statut {
+  Disponible
+  Lou_       @map("Loué")
+  Reserv_    @map("Reservé")
+  Perdu
+}
+
+enum paiements_statut {
+  Valid_     @map("Validé")
+  En_attente @map("En attente")
+  chou_      @map("Échoué")
+}
+
+enum locations_statut {
+  En_cours  @map("En cours")
+  Termin_e  @map("Terminée")
+  En_retard @map("En retard")
+}
