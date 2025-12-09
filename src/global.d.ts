@@ -16,6 +16,19 @@ export type Exemplaire = {
   statut: 'Disponible' | 'Loué' | 'Reservé' | 'Perdu';
 };
 
+// Type enrichi pour une réservation, incluant les détails de l'album
+export type Reservation = {
+  id_reservation: number;
+  date_debut: string;
+  date_fin: string;
+  statut: 'Active' | 'Annul_e' | 'Termin_e';
+  exemplaires: {
+    albums: {
+      titre: string;
+    };
+  };
+};
+
 declare global {
   interface Window {
     api: {
@@ -48,7 +61,7 @@ declare global {
       getExemplairesByAlbum(albumId: number): Promise<Exemplaire[]>;
 
       // ---------- RESERVATIONS (CLIENT) ----------
-      getMyReservations(): Promise<any[]>;
+      getMyReservations(): Promise<Reservation[]>;
       createReservation(data: {
         id_exemplaire: number;
       }): Promise<CrudResult>;

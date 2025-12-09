@@ -1,14 +1,6 @@
 import { ref } from "vue";
 import type { CrudResult } from "../preload";
-import type { Exemplaire } from "./useAlbums";
-
-export type Reservation = {
-  id_reservation: number;
-  id_exemplaire: number;
-  date_debut: string;
-  date_fin: string;
-  statut: string;
-};
+import type { Reservation, Exemplaire } from "../global";
 
 export function useReservations() {
   const reservations = ref<Reservation[]>([]);
