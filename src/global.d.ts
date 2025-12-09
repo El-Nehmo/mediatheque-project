@@ -1,5 +1,21 @@
 import type { LoginResult, CrudResult } from "./preload";
 
+// Types de données centraux basés sur le schéma Prisma
+export type Album = {
+  id_album: number;
+  titre: string;
+  artiste: string;
+  annee_sortie: number | null;
+  maison_disque: string | null;
+};
+
+export type Exemplaire = {
+  id_exemplaire: number;
+  num_inventaire: string;
+  etat: 'Neuf' | 'Bon' | 'Usé' | 'Endommagé';
+  statut: 'Disponible' | 'Loué' | 'Reservé' | 'Perdu';
+};
+
 declare global {
   interface Window {
     api: {
@@ -14,7 +30,7 @@ declare global {
       logout(): Promise<{ success: boolean }>;
 
       // ---------- ALBUMS / EXEMPLAIRES ----------
-      getAlbums(): Promise<any[]>;
+      getAlbums(): Promise<Album[]>;
       createAlbum(data: {
         titre: string;
         artiste: string;
@@ -29,7 +45,7 @@ declare global {
         maison_disque?: string | null;
       }): Promise<CrudResult>;
       deleteAlbum(id_album: number): Promise<CrudResult>;
-      getExemplairesByAlbum(albumId: number): Promise<any[]>;
+      getExemplairesByAlbum(albumId: number): Promise<Exemplaire[]>;
 
       // ---------- RESERVATIONS (CLIENT) ----------
       getMyReservations(): Promise<any[]>;
@@ -42,6 +58,3 @@ declare global {
 }
 
 export {};
-
-
-

@@ -1,20 +1,6 @@
 import { ref, computed } from "vue";
 import type { CrudResult } from "../preload";
-
-export type Album = {
-  id_album: number;
-  titre: string;
-  artiste: string;
-  annee_sortie: number | null;
-  maison_disque?: string | null;
-};
-
-export type Exemplaire = {
-  id_exemplaire: number;
-  num_inventaire: string;
-  etat: string;
-  statut: string;
-};
+import type { Album, Exemplaire } from "../global";
 
 export function useAlbums() {
   // --- état principal ---
