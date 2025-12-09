@@ -1,18 +1,5 @@
 import { ref, computed } from "vue";
-
-// On redéfinit le type minimal de résultat de login/register
-type LoginResult = {
-  success: boolean;
-  message?: string;
-  user?: {
-    id: number;
-    nom: string;
-    prenom: string;
-    email: string;
-    roleId: number;
-    roleName: string;
-  };
-};
+import type { LoginResult } from "../preload";
 
 export function useAuth() {
   // --- Login ---
