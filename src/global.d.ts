@@ -21,7 +21,7 @@ export type Reservation = {
   id_reservation: number;
   date_debut: string;
   date_fin: string;
-  statut: 'Active' | 'Annul_e' | 'Termin_e';
+  statut: 'Active' | 'Annul_e' | 'Termin_e' | 'En_retard';
   exemplaires: {
     albums: {
       titre: string;
