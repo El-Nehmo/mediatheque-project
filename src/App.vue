@@ -1,15 +1,13 @@
 <script setup lang="ts">
 import { watch, onMounted } from 'vue';
+import Login from './components/Login.vue';
 import { useAuth } from './composables/useAuth';
 import { useAlbums } from './composables/useAlbums';
 import { useReservations } from './composables/useReservations';
 
 // 1. Récupération de la logique d'Authentification
-const {
-  email, password, loginError, isLoggedIn, userName, userRole, isStaff, isClient,
-  isRegisterMode, regNom, regPrenom, regEmail, regPassword, regPasswordConfirm, registerError,
-  login, register, logout, switchToRegister, switchToLogin
-} = useAuth();
+const auth = useAuth();
+const { isLoggedIn, userName, userRole, isStaff, isClient, logout } = auth;
 
 // 2. Récupération de la logique des Albums
 const {
@@ -47,85 +45,8 @@ watch(isLoggedIn, (connected) => {
     <h1 class="mb-4">Médiathèque</h1>
 
     <!-- AUTH -->
-    <div v-if="!isLoggedIn" class="row justify-content-center">
-      <div class="col-md-6">
-        <div class="card">
-          <div class="card-body">
-            <div class="d-flex justify-content-between mb-3">
-              <button
-                class="btn btn-sm"
-                :class="!isRegisterMode ? 'btn-primary' : 'btn-outline-primary'"
-                @click="switchToLogin"
-              >
-                Se connecter
-              </button>
-              <button
-                class="btn btn-sm"
-                :class="isRegisterMode ? 'btn-primary' : 'btn-outline-primary'"
-                @click="switchToRegister"
-              >
-                S'inscrire
-              </button>
-            </div>
-
-            <!-- Formulaire de connexion -->
-            <div v-if="!isRegisterMode">
-              <h2 class="h4 mb-3">Connexion</h2>
-              <div v-if="loginError" class="alert alert-danger">{{ loginError }}</div>
-
-              <div class="mb-3">
-                <label class="form-label">Email</label>
-                <input v-model="email" type="email" class="form-control" />
-              </div>
-
-              <div class="mb-3">
-                <label class="form-label">Mot de passe</label>
-                <input v-model="password" type="password" class="form-control" />
-              </div>
-
-              <button class="btn btn-primary w-100" @click="login">
-                Se connecter
-              </button>
-            </div>
-
-            <!-- Formulaire d'inscription -->
-            <div v-else>
-              <h2 class="h4 mb-3">Inscription</h2>
-              <div v-if="registerError" class="alert alert-danger">{{ registerError }}</div>
-
-              <div class="mb-3">
-                <label class="form-label">Prénom</label>
-                <input v-model="regPrenom" type="text" class="form-control" />
-              </div>
-
-              <div class="mb-3">
-                <label class="form-label">Nom</label>
-                <input v-model="regNom" type="text" class="form-control" />
-              </div>
-
-              <div class="mb-3">
-                <label class="form-label">Email</label>
-                <input v-model="regEmail" type="email" class="form-control" />
-              </div>
-
-              <div class="mb-3">
-                <label class="form-label">Mot de passe</label>
-                <input v-model="regPassword" type="password" class="form-control" />
-              </div>
-
-              <div class="mb-3">
-                <label class="form-label">Confirmation du mot de passe</label>
-                <input v-model="regPasswordConfirm" type="password" class="form-control" />
-              </div>
-
-              <button class="btn btn-success w-100" @click="register">
-                Créer mon compte
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <!-- On passe tout l'objet auth au composant Login -->
+    <Login v-if="!isLoggedIn" :auth="auth" />
 
     <!-- APP -->
     <div v-else>
