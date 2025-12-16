@@ -16,7 +16,7 @@ export type Exemplaire = {
   statut: 'Disponible' | 'Loué' | 'Reservé' | 'Perdu';
 };
 
-// Type enrichi pour une réservation, incluant les détails de l'album
+// Type enrichi pour une réservation, incluant les détails de l'album et de l'utilisateur
 export type Reservation = {
   id_reservation: number;
   date_debut: string;
@@ -26,6 +26,10 @@ export type Reservation = {
     albums: {
       titre: string;
     };
+  };
+  utilisateurs: {
+    nom: string;
+    prenom: string;
   };
 };
 

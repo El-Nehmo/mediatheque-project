@@ -8,8 +8,20 @@ export type ReservationCrudResult = {
 // Liste toutes les réservations de l'utilisateur connecté
 export async function getReservationsForUser(userId: number) {
   try {
-    const all = await prisma.reservations.findMany();
-    return all.filter((r: any) => r.id_utilisateur === userId);
+    const reservations = await prisma.reservations.findMany({
+      where: {
+        id_utilisateur: userId,
+      },
+      include: {
+        exemplaires: {
+          include: {
+            albums: true,
+          },
+        },
+        utilisateurs: true,
+      },
+    });
+    return reservations;
   } catch (err) {
     console.error("Erreur getReservationsForUser (service):", err);
     return [];

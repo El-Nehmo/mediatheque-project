@@ -1,144 +1,125 @@
 # Médiathèque App
 
-Application Electron pour la gestion d'une médiathèque musicale (albums, exemplaires, réservations, utilisateurs).
+Application Desktop pour la gestion d'une médiathèque musicale (albums, exemplaires, réservations, utilisateurs), construite avec **Electron**, **Vue.js** et **TypeScript**.
 
 ---
 
 ## Fonctionnalités
 
-- Authentification (connexion/inscription)
-- Gestion des albums (CRUD, réservé au staff)
-- Gestion des exemplaires d'albums
-- Réservation d'exemplaires (clients)
-- Annulation de réservations
-- Vue des réservations personnelles
+- **Authentification** : Système de connexion et d'inscription sécurisé (hashage bcrypt).
+- **Rôles** : Distinction entre l'interface **Client** et **Staff** (Admin/Employé).
+- **Gestion des Albums (Staff)** : Ajout, modification et suppression (CRUD).
+- **Gestion des Exemplaires** : Suivi des copies physiques liées aux albums.
+- **Réservations (Clients)** : Emprunt d'exemplaires disponibles, annulation et suivi via un tableau de bord personnel.
 
 ---
 
-## Technologies utilisées
+## Architecture Technique
 
-- **Electron** : Application desktop multiplateforme
-- **Vue.js** : Interface utilisateur réactive
-- **TypeScript** : Typage statique
-- **Prisma** : ORM pour la base de données MySQL
-- **MySQL** : Base de données relationnelle
-- **Bootstrap** : Design et composants UI
-- **Webpack** : Bundling et configuration Electron
-- **bcryptjs** : Hash des mots de passe
+- **Electron** : Application desktop multiplateforme.
+- **Vue.js 3** : Interface utilisateur réactive.
+- **TypeScript** : Langage typé pour la robustesse.
+- **Prisma** : ORM moderne pour l'accès aux données.
+- **Base de données** : Compatible MySQL ou PostgreSQL.
+- **Bootstrap 5** : Design et composants UI.
 
----
-
-## Architecture
+### Structure du projet
 
 ```text
 mediatheque-app/
 │
 ├── src/
-│   ├── main/                # Processus principal Electron (IPC, session)
-│   ├── services/            # Accès aux données via Prisma
-│   ├── ui/                  # Hooks Vue pour la logique front
-│   ├── renderer.ts          # Point d'entrée Vue
-│   ├── preload.ts           # Bridge IPC sécurisé
-│   ├── index.html, index.css
-│
+│   ├── main/          # Processus Principal (Backend Electron, IPC, Session)
+│   ├── services/      # Logique métier et accès BDD (Prisma)
+│   ├── composables/   # Logique réactive (Hooks Vue)
+│   ├── components/    # Composants Vue (UI)
+│   ├── renderer.ts    # Point d'entrée Vue
+│   ├── preload.ts     # Bridge sécurisé IPC
+│   └── ...
 
-# Médiathèque App
-
-Application desktop pour gérer une médiathèque musicale : albums, exemplaires, réservations, utilisateurs.
-
-## Ce que fait l'app
-
-- Permet au staff d'ajouter, modifier, supprimer des albums
-- Permet aux clients de réserver et annuler des exemplaires
-- Gestion des utilisateurs et authentification
-
-## Technologies
-
-- Electron
-- Vue.js
-- TypeScript
-- Prisma (ORM)
-- MySQL
-
-## Prérequis
-
-- Node.js (version 18 ou plus)
-- MySQL installé (local ou distant)
-
-## Installation
-
-1. Clone le projet :
-   ```sh
-   git clone <URL_DU_DEPOT>
-   cd mediatheque-project/mediatheque-app
-   ```
-
-2. Installe les dépendances :
-   ```sh
-   npm install
-   ```
-
-3. Configure la base de données :
-   - Crée un fichier `.env` à la racine avec :
-     ```env
-     DATABASE_URL="mysql://user:password@localhost:3306/mediatheque_db"
-     ```
-
-4. Génère le client Prisma :
-   ```sh
-   npx prisma generate
-   ```
-
-5. Applique le schéma à la base :
-   ```sh
-   npx prisma migrate dev
-   ```
-
-## Lancer l'application
-
-```sh
-npm start
 ```
 
-L'application Electron démarre et tu peux l'utiliser !
+---
 
-Dans le dossier mediatheque-app :
+##Prérequis* **Node.js** (version 18 ou supérieure)
+* **Base de données** : MySQL ou PostgreSQL installé localement ou accessible à distance.
 
-npm run start
+---
+
+##Installation1. **Cloner le projet :**
+```bash
+git clone <URL_DU_DEPOT>
+cd mediatheque-project/mediatheque-app
+
+```
 
 
-Electron Forge compile le projet (TypeScript + Webpack),
+2. **Installer les dépendances :**
+```bash
+npm install
 
-lance un serveur pour la partie Vue,
+```
 
-puis ouvre automatiquement la fenêtre de l’application desktop “Médiathèque”.
 
-7. Utilisation rapide
+3. **Configurer la base de données :**
+Créez un fichier `.env` à la racine du projet. Copiez l'une des lignes suivantes selon votre base de données :
+*Pour MySQL :*
+```env
+DATABASE_URL="mysql://user:password@localhost:3306/mediatheque_db"
 
-Inscription :
+```
 
-Créer un compte via le formulaire d’inscription (vous serez client par défaut).
 
-Connexion :
+*Pour PostgreSQL :*
+```env
+DATABASE_URL="postgresql://user:password@localhost:5432/mediatheque_db"
 
-Se connecter avec l’email et le mot de passe utilisés à l’inscription.
+```
 
-Selon le rôle :
 
-Admin / Employé
+*(Pensez à adapter `user`, `password` et le nom de la base `mediatheque_db` selon votre configuration)*.
+> **Note** : Si vous passez de MySQL à PostgreSQL (ou inversement), vérifiez que le `provider` dans votre fichier `prisma/schema.prisma` correspond bien (`provider = "mysql"` ou `provider = "postgresql"`).
 
-Accès au formulaire pour créer / modifier / supprimer des albums.
 
-Liste des albums à gauche, détail + exemplaires à droite.
+4. **Initialiser la base de données (Prisma) :**
+Générez le client et créez les tables :
+```bash
+npx prisma generate
+npx prisma migrate dev
 
-Client
+```
 
-Voir la liste des albums.
 
-Cliquer sur un album → voir les exemplaires disponibles.
 
-Cliquer sur “Réserver” pour créer une réservation.
+---
 
-Voir la section “Mes réservations”.
+##Lancer l'applicationPour démarrer l'application en mode développement :
 
-Cliquer sur “Annuler” pour annuler une réservation active.
+```bash
+npm start
+
+```
+
+Cela va compiler le projet (TypeScript + Webpack), lancer le serveur Vue, et ouvrir la fenêtre Electron.
+
+---
+
+##Guide d'utilisation rapide1. **Inscription** : Créez un premier compte via le formulaire. Par défaut, ce compte aura le rôle **Client** (si créé après avoir inséré le script data_insetion.sql dans le dossier script si pas aura le rôle **admin** pour l'id 1 (id 2 = staff et àpd de 3 client)).
+2. **Connexion** : Connectez-vous avec vos identifiants.
+
+###Selon votre rôle :* **Staff (Admin / Employé)** :
+* Vous avez accès aux outils d'édition.
+* Sélectionnez un album dans la liste pour voir ses détails, modifier ses infos ou le supprimer.
+
+
+* **Client** :
+* Parcourez la liste des albums.
+* Cliquez sur un album pour voir les exemplaires disponibles.
+* Cliquez sur **"Réserver"** pour mettre un exemplaire de côté.
+* Consultez et annulez vos réservations dans la section "Mes réservations".
+
+
+
+```
+
+```
